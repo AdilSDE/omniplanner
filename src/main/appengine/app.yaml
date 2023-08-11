@@ -1,0 +1,37 @@
+runtime: java
+env: flex
+runtime_config:
+  jdk: openjdk8
+# name of the service
+#service: default
+
+handlers:
+- url: /.*
+  script: this field is required, but ignored
+
+resources:
+  cpu: 4
+  memory_gb: 8
+  disk_size_gb: 10
+
+env_variables:
+  BUCKET_NAME: "image-generator"
+  ERROR_REPORT_BUCKET_NAME: "omniplanner-error-reports"
+  # when the request takes longer than the limit below (in ms), report it to ERROR_REPORT_BUCKET_NAME  
+  REPORT_LONG_TASKS_LIMIT: 5000 
+
+readiness_check:
+  path: "/readiness_check"
+
+liveness_check:
+  path: "/liveness_check"
+
+#manual_scaling:
+#  instances: 1
+
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 5
+  cool_down_period_sec: 180
+  cpu_utilization:
+    target_utilization: 0.6
