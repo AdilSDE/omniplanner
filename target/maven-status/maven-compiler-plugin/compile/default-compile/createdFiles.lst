@@ -1,10 +1,14 @@
 com/microd/imagegenerator/ImageGeneratorOutputResult.class
+com/microd/imagegenerator/handler/StringHandler.class
+com/microd/imagegenerator/fucntioncontroller/Generate.class
 com/microd/imagegenerator/ImageGeneratorOutput.class
-com/microd/imagegenerator/ServletInitializer.class
 com/microd/imagegenerator/Common.class
-com/microd/imagegenerator/PDFConverter.class
+com/microd/imagegenerator/config/StorageConfig.class
 com/microd/imagegenerator/ImageGeneratorApplication.class
+com/microd/imagegenerator/handler/RequestHandler.class
+com/microd/imagegenerator/Generator.class
+com/microd/imagegenerator/fucntioncontroller/Health.class
+com/microd/imagegenerator/PDFConverter.class
 com/microd/imagegenerator/RoomplannerImageGeneratorException.class
 com/microd/imagegenerator/ImageGeneratorInputData.class
-com/microd/imagegenerator/Generator.class
 com/microd/imagegenerator/ImageGeneratorInput.class

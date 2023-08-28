@@ -1,33 +1,48 @@
 package com.microd.imagegenerator;
 
-import java.io.*;
-import java.util.*;
-
-import com.google.cloud.storage.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.DatatypeConverter;
-
-//import org.apache.batik.apps.rasterizer.Main;
-
-// if using 1.8, use this.
-//import java.util.Base64;
-
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+import javax.xml.bind.DatatypeConverter;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
+
+@Service
 public class Generator {
 
-  private static final String DEFAULT_BUCKET_NAME = "image-generator";
+  private static final String DEFAULT_BUCKET_NAME = "revalize-image-generator";
 
-  private Storage storage = null;
+ /* INFO :: for Gcp
+ private Storage storage = null;*/
 
-  public ImageGeneratorOutput handleRequest(ImageGeneratorInput paramDictInput, HttpServletRequest request) {
+	@Value("${application.bucket.name}")
+	private String bucketName;
+
+	@Autowired
+	private AmazonS3 s3Client;
+
+  public ImageGeneratorOutput handleRequest(ImageGeneratorInput paramDictInput,  APIGatewayProxyRequestEvent request) {
 
     // check input parameters
     try {
       checkParameters(paramDictInput);
     } catch (Exception e) {
-      RoomplannerImageGeneratorException.ReportException(e, storage, paramDictInput, request);
+      RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request);
       return new ImageGeneratorOutput(e.getMessage());
     }
 
@@ -150,7 +165,7 @@ public class Generator {
             throw new Exception("Converting page ("+pageIndex+"}: Error: "+main.error);
           }
 				} catch (Exception e) {
-          RoomplannerImageGeneratorException.ReportException(e, storage, paramDictInput, request);
+          RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request);
 					output = new ImageGeneratorOutput(e.getMessage());
 				}
 			}
@@ -174,17 +189,29 @@ public class Generator {
 				String keyPath = "generated/" + UUID.randomUUID().toString() + "_" + planName+ "." + suffix;
 
 				try {
+
+					ObjectMetadata metadata = new ObjectMetadata();
+					metadata.setContentType(mimeType);
+					metadata.setContentDisposition("attachment; filename=" + planName + "." + suffix);
+
+					Common.Log("writing file to aws .....!!!!!!!!!!");
+					s3Client.putObject(new PutObjectRequest(bucket, keyPath, new ByteArrayInputStream(data), metadata));
+
+					url = s3Client.getUrl(bucket, keyPath).toString();
+					System.out.println("Result written to " + url);
+
+					/*INFO :: for GCP Storage...
 					storage = StorageOptions.getDefaultInstance().getService();
 					// save to bucket with correct mime type
 					// setContentDisposition ensures the file will be downloaded without the prefix ["generated/" + UUID.randomUUID().toString()]
 					Blob blob = storage.create(
 	            BlobInfo.newBuilder(bucket, keyPath).setContentType(mimeType).setContentDisposition("attachment; filename="+planName+ "." + suffix).build(),
 	            data);
-					url = blob.getMediaLink();
+					url = blob.getMediaLink();*/
 					Common.Log("Result written to "+url);
 				} catch(Exception e) {
 					Common.Error("Error saving to Cloud Storage: "+e.getMessage());
-          RoomplannerImageGeneratorException.ReportException(e, storage, paramDictInput, request);
+          RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request);
 				}
 
 				// convert to base64 8859-01 charset; does that matter? is that
@@ -218,10 +245,10 @@ public class Generator {
         limit = Long.parseLong(strLimit);
       }
       if (output.getSuccess() && timeElapsedMs > limit) {
-        RoomplannerImageGeneratorException.ReportTimeLimitExceeding(timeElapsedMs, storage, paramDictInput, request);
+        RoomplannerImageGeneratorException.ReportTimeLimitExceeding(timeElapsedMs, s3Client, paramDictInput, request);
       }
 		} catch (Throwable e) {
-      RoomplannerImageGeneratorException.ReportException(e, storage, paramDictInput, request);
+      RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request);
 			output = new ImageGeneratorOutput(e.getMessage());
 		}
 

@@ -1,1 +1,4 @@
 com/microd/imagegenerator/ImageGeneratorApplicationTests.class
+com/microd/imagegenerator/mock/MockImageGenerationInput.class
+com/microd/imagegenerator/unit/ImageGeneratorHandlerTest.class
+com/microd/imagegenerator/unit/TimeLimitExceededTests.class
