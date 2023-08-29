@@ -2,7 +2,7 @@ package com.microd.imagegenerator;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import org.json.JSONObject;
 
-public class ImageGeneratorInput extends  APIGatewayProxyRequestEvent {
+public class ImageGeneratorInput{
 	private ImageGeneratorInputData data;
 	
 	public void setParamDictionary(ImageGeneratorInputData d) {
