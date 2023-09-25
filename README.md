@@ -6,7 +6,7 @@
 ## Table of Contents
 1.[Getting Started Terraform Deployment Steps](#steps-to-deploy-lambda-omni-planner-through-terraform)
 
-2.[Java Maven Steps](#java-maven-)
+2.[Java Maven Steps](#java-maven)
 
 ## Steps to deploy lambda omni-planner through Terraform
 
@@ -14,25 +14,25 @@
 
 Ex. In my case the directory is “aws-lambda-terraform-java-play-deployed/” like shown in below picture
 
-![](/home/adil.shaikh/workspace_intellij/imagegenerator/src/main/resources/static/images/directory.png)
+![](src/main/resources/static/images/build.png)
 
 2.When we cd into the directory “aws-lambda-terraform-java-play-deployed/” we can see the files  shown in picture below.
 
-![](/home/adil.shaikh/workspace_intellij/imagegenerator/src/main/resources/static/images/Ls.png)
+![](src/main/resources/static/images/Ls.png)
 
 
 3.Now run the command ./build_and_deploy.sh or bash build_and_deploy.sh as shown in below.
 
-![](/home/adil.shaikh/workspace_intellij/imagegenerator/src/main/resources/static/images/build.png)
+![](src/main/resources/static/images/build.png)
 
 OR
 
-![](/home/adil.shaikh/workspace_intellij/imagegenerator/src/main/resources/static/images/build_bash.png)
+![](src/main/resources/static/images/build_bash.png)
 
 4.Now the above code will run the shell script which will test, build and create the artifact and also create terraform workspace and deploy the artifact to lambda. If you want to run same code in different environment change the .tfvars file and change workspace names in the places shown below
 Ex. for me i have created a cors_test workspace and selected workspace before deploying the code.
 
-![](/home/adil.shaikh/workspace_intellij/imagegenerator/src/main/resources/static/images/build_bash_sh.png)
+![](src/main/resources/static/images/build_bash_sh.png)
 
 ## Java Maven 
 ### Steps & Commands: Java and Maven commands (To Run  & Build locally )
