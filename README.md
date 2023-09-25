@@ -14,7 +14,7 @@
 
 Ex. In my case the directory is “aws-lambda-terraform-java-play-deployed/” like shown in below picture
 
-![](src/main/resources/static/images/build.png)
+![](src/main/resources/static/images/directory.png)
 
 2.When we cd into the directory “aws-lambda-terraform-java-play-deployed/” we can see the files  shown in picture below.
 
