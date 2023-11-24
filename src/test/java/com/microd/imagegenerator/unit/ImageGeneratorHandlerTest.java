@@ -3,6 +3,7 @@ package com.microd.imagegenerator.unit;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.util.json.Jackson;
 import com.microd.imagegenerator.Generator;
 import com.microd.imagegenerator.ImageGeneratorInput;
@@ -30,6 +31,8 @@ public class ImageGeneratorHandlerTest {
 
     @Mock
     private AmazonS3 s3Client;
+    @Mock
+    private AmazonSNSClient snsClient;
     @Mock
     private PDFConverter pdfConverter;
 
@@ -123,7 +126,7 @@ public class ImageGeneratorHandlerTest {
         when(s3Client.putObject(ArgumentMatchers.any(PutObjectRequest.class))).thenReturn(ArgumentMatchers.any());
         URL mockUrl = new URL("http://mock.aws.com");
         when(s3Client.getUrl(ArgumentMatchers.any(), "error-report-2023-08-24T23-40-04-D9KXUZQT.json")).thenReturn(mockUrl);
-
+        when(snsClient.publish(ArgumentMatchers.any())).thenReturn(ArgumentMatchers.any());
         // Call theM method being tested
         ImageGeneratorOutput output = generator.handleRequest(input, request);
 
@@ -143,7 +146,7 @@ public class ImageGeneratorHandlerTest {
         when(s3Client.putObject(ArgumentMatchers.any(PutObjectRequest.class))).thenReturn(ArgumentMatchers.any());
         URL mockUrl = new URL("http://mock.aws.com");
         when(s3Client.getUrl(ArgumentMatchers.any(), "error-report-2023-08-24T23-40-04-D9KXUZQT.json")).thenReturn(mockUrl);
-
+        when(snsClient.publish(ArgumentMatchers.any())).thenReturn(ArgumentMatchers.any());
         // Call theM method being tested
         ImageGeneratorOutput output = generator.handleRequest(input, request);
 
@@ -164,7 +167,7 @@ public class ImageGeneratorHandlerTest {
         when(s3Client.putObject(ArgumentMatchers.any(PutObjectRequest.class))).thenReturn(ArgumentMatchers.any());
         URL mockUrl = new URL("http://mock.aws.com");
         when(s3Client.getUrl(ArgumentMatchers.any(), "error-report-2023-08-24T23-40-04-D9KXUZQT.json")).thenReturn(mockUrl);
-
+        when(snsClient.publish(ArgumentMatchers.any())).thenReturn(ArgumentMatchers.any());
         // Call theM method being tested
         ImageGeneratorOutput output = generator.handleRequest(input, request);
 
@@ -190,5 +193,28 @@ public class ImageGeneratorHandlerTest {
 
         Assertions.assertFalse(output.getSuccess());
         Mockito.verify(s3Client,Mockito.times(1)).putObject(ArgumentMatchers.any(PutObjectRequest.class));
+    }
+
+    @Test()
+    @DisplayName(
+            " Test case :An unexpected error has occurred and alert notification sent to subscribed users."
+    )
+    public void testHandleRequest_Failure_Alert_Notification() throws Exception {
+        // Create mock input objects
+        ImageGeneratorInput input = MockImageGenerationInput.getImageGeneratorInput("png");
+        input.setParamDictionary(null);
+        APIGatewayProxyRequestEvent request = new APIGatewayProxyRequestEvent();
+
+        // Set up behavior for mock S3Client
+        when(s3Client.putObject(ArgumentMatchers.any(PutObjectRequest.class))).thenReturn(ArgumentMatchers.any());
+        URL mockUrl = new URL("http://mock.aws.com");
+        when(s3Client.getUrl(ArgumentMatchers.any(), "error-report-2023-08-24T23-40-04-D9KXUZQT.json")).thenReturn(mockUrl);
+        when(snsClient.publish(ArgumentMatchers.any())).thenReturn(ArgumentMatchers.any());
+        // Call theM method being tested
+        ImageGeneratorOutput output = generator.handleRequest(input, request);
+
+        Assertions.assertFalse(output.getSuccess());
+        Mockito.verify(s3Client,Mockito.times(1)).putObject(ArgumentMatchers.any(PutObjectRequest.class));
+        Mockito.verify(snsClient,Mockito.times(1)).publish(ArgumentMatchers.any());
     }
 }

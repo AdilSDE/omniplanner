@@ -1,0 +1,8 @@
+Hi Team ,
+
+An error has occurred while converting the file to the requested format. Please find the details below:
+
+Error: [{{exceptionMessage}}]
+
+To investigate further, you can download the {{errorDescription}} file by clicking on the link below
+Download Link: ->: {{url}}

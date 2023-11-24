@@ -25,6 +25,12 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
 
+  #Exclude Aws RegionProviderAutoConfiguration
+  autoconfigure:
+    exclude:
+      - org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration
+      - org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration
+
 #server:
 #  port: 9090
 

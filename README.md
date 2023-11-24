@@ -63,12 +63,12 @@ Ex. for me i have created a cors_test workspace and selected workspace before de
 
 2.Set the below properties in  system env
 
-> accessKey=(value you may get it from aws console); accessSecret=(value you may get it from aws console); region=us-east-1
+> accessKey=(value you may get it from aws console); accessSecret=(value you may get it from aws console); region=us-east-1 ;topicArn=(value you may get it from aws console)
 
 or if you are using IDE for eg STS or Intellij Idea
 right click on ImageGeneratorApplication.java ->> go to modify run configuration ->> inside Environment Variable row mentioned  below properties separated by ";" and apply and run.
 
-> accessKey=(value you may get it from aws console); accessSecret=(value you may get it from aws console); region=us-east-1
+> accessKey=(value you may get it from aws console); accessSecret=(value you may get it from aws console); region=us-east-1;topicArn=(value you may get it from aws console)
 
 3.when accessing the spring cloud function locally enclosed the whole request inside 
 
@@ -86,3 +86,19 @@ right click on ImageGeneratorApplication.java ->> go to modify run configuration
 2. mvn clean compile install -DskipTests (build skipping the test)
 
 you can run the above command through command prompt(from java maven project directory) or through IDE.
+
+#### Steps to configure SNS at Aws Dashboard
+
+1. login to aws console
+2. Search and go to [SNS](https://us-east-1.console.aws.amazon.com/sns/v3/home?region=us-east-1#/topic/arn:aws:sns:us-east-1:750515430717:omniplanner-error-topic) service section -> select **Topics**  from the left panel 
+there you will find list of topics name, select **omniplanner-error-topic** -> there 
+you will find the details of topic like arn: ,topic owner etc.
+3. There will be option to **Create Subscription** **Delete**  **Edit** to manipulate accordingly.
+
+#### Steps to configure CloudWatch Synthetics Canaries at Aws Dashboard
+
+1. login to aws console
+2. Search and go to [CloudWatch](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#synthetics:canary/list) services section -> from left panel select **Application monitoring** -> then select **Synthetics Canaries**
+3. There will be option to **Create Canary,** **edit,** **stop** ect.
+4. select **omni-planner-canaries** to see details about canary,Also you may select **Action** tab to edit the canary if needed.
+5. If you wish to select edit ,there you find multiple options to edit CRON expressions,Edit dummy request,Run continuously ,Environment variables,Data retention,Data Storage,Additional configuration ,Active tracing - optional etc.

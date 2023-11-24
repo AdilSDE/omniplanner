@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.sns.AmazonSNSClient;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,13 +37,16 @@ public class Generator {
 	@Autowired
 	private AmazonS3 s3Client;
 
+	@Autowired
+	private AmazonSNSClient snsClient;
+
   public ImageGeneratorOutput handleRequest(ImageGeneratorInput paramDictInput,  APIGatewayProxyRequestEvent request) {
 
     // check input parameters
     try {
       checkParameters(paramDictInput);
     } catch (Exception e) {
-      RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request);
+      RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request,snsClient);
       return new ImageGeneratorOutput(e.getMessage());
     }
 
@@ -165,7 +169,7 @@ public class Generator {
             throw new Exception("Converting page ("+pageIndex+"}: Error: "+main.error);
           }
 				} catch (Exception e) {
-          RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request);
+          RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request,snsClient);
 					output = new ImageGeneratorOutput(e.getMessage());
 				}
 			}
@@ -211,7 +215,7 @@ public class Generator {
 					Common.Log("Result written to "+url);
 				} catch(Exception e) {
 					Common.Error("Error saving to Cloud Storage: "+e.getMessage());
-          RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request);
+          RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request,snsClient);
 				}
 
 				// convert to base64 8859-01 charset; does that matter? is that
@@ -245,10 +249,10 @@ public class Generator {
         limit = Long.parseLong(strLimit);
       }
       if (output.getSuccess() && timeElapsedMs > limit) {
-        RoomplannerImageGeneratorException.ReportTimeLimitExceeding(timeElapsedMs, s3Client, paramDictInput, request);
+        RoomplannerImageGeneratorException.ReportTimeLimitExceeding(timeElapsedMs, s3Client, paramDictInput, request,snsClient);
       }
 		} catch (Throwable e) {
-      RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request);
+      RoomplannerImageGeneratorException.ReportException(e, s3Client, paramDictInput, request,snsClient);
 			output = new ImageGeneratorOutput(e.getMessage());
 		}
 
